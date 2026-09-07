@@ -52,6 +52,13 @@ inventory:
   # feed is stale/untracked; treat those variants as "unknown", never "out".
   treat_negative_as_unknown: true
   dropship_location_prefix: "DS - "
+  # SKUs with these prefixes ship direct from the vendor's own stock (rolls, bolts,
+  # case packs). Their on-hand is not Linda's inventory, so they are excluded from
+  # out-of-stock alerts and purchasing. They still count toward ranking.
+  dropship_sku_prefixes:
+    - "QDDS-"    # Quilters Dream rolls
+    - "WCDS-"    # Warm Company rolls and full cases
+    - "PDS-"     # Pellon bolts and rolls
   preorder:
     tag: "Pre-Order"
     title_suffix: " (Available for PRE-ORDER)"

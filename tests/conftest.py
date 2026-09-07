@@ -28,6 +28,9 @@ def catalog():
     vs.append(mk(3, "Free Returns + Package Protection", 55000, 18000, 1999999, vendor="re:do"))
     vs.append(mk(4, "Linda's Gift Card", 20000, 1145, -9849))
     vs.append(mk(5, "Pellon SF101 Bolt", 113000, 632, -6657, vendor="Pellon"))  # negative feed
+    vs[-1].sku = "PDS-SF101-2010BOLT"  # dropship prefix
+    vs.append(mk(8000, "QD Select Cotton Queen Roll", 14000, 16, -324, vendor="Quilters Dream Batting"))
+    vs[-1].sku = "QDDS-N4QR"
     vs.append(mk(6, "460RT Rotary Handle", 5000, 428, 15726, vendor="Famore", price=19.99, cost=8.0, u14=150, up14=280))  # overstock, falling
     for i in range(7, 700):
         vs.append(mk(i, f"Fabric {i}", max(1.0, 4000 - i * 5), 10, 5 if i % 3 else 0))

@@ -12,6 +12,7 @@ from dataclasses import dataclass
 
 from ..config import Settings
 from ..models import Recommendation, Variant
+from .ranking import is_dropship
 
 
 @dataclass
@@ -51,8 +52,8 @@ def purchase_plan(ranked: list[Variant], settings: Settings, on_order: dict[str,
     for v in ranked:
         if v.rank is None or v.rank > top_n or v.daily_velocity <= 0:
             continue
-        if v.inventory_quantity < 0:
-            continue  # untracked feed; purchasing is a vendor conversation, not a formula
+        if v.inventory_quantity < 0 or is_dropship(v, settings):
+            continue  # vendor-shipped stock; purchasing is a vendor conversation, not a formula
         rule = settings.vendor(v.vendor)
         horizon = rule.lead_time_days + review
         d = v.daily_velocity * growth

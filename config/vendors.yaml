@@ -10,11 +10,11 @@ vendors:
     dropship: true
     notes: "~34% of revenue. Batting rolls run 6-8 week backorders in peak; keep 45+ days cover."
   "Quilters Dream Batting":
-    lead_time_days: 42
+    lead_time_days: 56
     moq_units: 12
     preorder_ok: true
     dropship: true
-    notes: "Pre-order roughly 8 weeks on queen rolls."
+    notes: "Packages are stocked in-house (8-week lead); rolls (QDDS-) are dropship."
   "Pellon":
     lead_time_days: 21
     moq_units: 12

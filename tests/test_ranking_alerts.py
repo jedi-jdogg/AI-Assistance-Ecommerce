@@ -37,7 +37,16 @@ def test_number_one_low_cover_is_critical(settings, catalog):
     assert "days left" in roll[0].detail
 
 
-def test_negative_feed_is_info_not_oos(settings, catalog):
+def test_dropship_skus_never_alert(settings, catalog):
+    ranked = rank_variants(catalog, settings)
+    alerts = stock_alerts(ranked, settings)
+    assert not [a for a in alerts if "SF101" in a.title or "Queen Roll" in a.title]
+
+
+def test_negative_non_dropship_is_info(settings, catalog):
+    for v in catalog:
+        if "SF101" in v.product_title:
+            v.sku = "SF101-LOCAL"
     ranked = rank_variants(catalog, settings)
     alerts = stock_alerts(ranked, settings)
     sf = [a for a in alerts if "SF101" in a.title]

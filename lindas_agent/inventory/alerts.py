@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from ..config import Settings
 from ..models import Alert, Severity, Variant
-from .ranking import title_says_preorder
+from .ranking import is_dropship, title_says_preorder
 
 
 def _cover_str(v: Variant) -> str:
@@ -32,6 +32,8 @@ def stock_alerts(ranked: list[Variant], settings: Settings) -> list[Alert]:
 
     for v in ranked:
         if v.rank is None or v.rank > watch_n:
+            continue
+        if is_dropship(v, settings):
             continue
         tier = "top100" if v.rank <= crit_n else "top500"
         vendor_rule = settings.vendor(v.vendor)
@@ -145,5 +147,6 @@ def preorder_candidates(ranked: list[Variant], settings: Settings) -> list[Varia
     crit_n = int(settings.get("ranking.tiers.critical", 100))
     return [
         v for v in ranked
-        if v.rank is not None and v.rank <= crit_n and 0 >= v.inventory_quantity >= 0 and v.inventory_policy.upper() == "DENY"
+        if v.rank is not None and v.rank <= crit_n and v.inventory_quantity == 0
+        and v.inventory_policy.upper() == "DENY" and not is_dropship(v, settings)
     ]

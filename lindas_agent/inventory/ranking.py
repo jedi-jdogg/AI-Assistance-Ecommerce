@@ -24,6 +24,12 @@ def is_excluded(v: Variant, settings: Settings) -> bool:
     return False
 
 
+def is_dropship(v: Variant, settings: Settings) -> bool:
+    """Vendor-shipped SKU (roll/bolt/case): on-hand is the vendor's, not Linda's."""
+    sku = (v.sku or "").upper()
+    return any(sku.startswith(p.upper()) for p in settings.get("inventory.dropship_sku_prefixes", []))
+
+
 def rank_variants(variants: list[Variant], settings: Settings) -> list[Variant]:
     """Return sellable variants sorted by the configured metric, with .rank set (1-based)."""
     key = settings.get("ranking.rank_by", "net_sales")
