@@ -1,0 +1,51 @@
+# Vendor lead times and purchasing rules. Days are calendar days from PO to receipt.
+# "dropship: true" means the DS - <vendor> location ships direct; Linda's still
+# needs the vendor to have stock, so alerts stay on but purchasing is a vendor call.
+vendors:
+  "Hobbs Bonded Fibers":
+    lead_time_days: 28
+    moq_units: 24
+    case_pack: 1
+    preorder_ok: true
+    dropship: true
+    notes: "~34% of revenue. Batting rolls run 6-8 week backorders in peak; keep 45+ days cover."
+  "Quilters Dream Batting":
+    lead_time_days: 42
+    moq_units: 12
+    preorder_ok: true
+    dropship: true
+    notes: "Pre-order roughly 8 weeks on queen rolls."
+  "Pellon":
+    lead_time_days: 21
+    moq_units: 12
+    preorder_ok: true
+    dropship: true
+    notes: "SF101 / 911FF show negative on-hand; feed is untracked."
+  "Warm Company":
+    lead_time_days: 21
+    preorder_ok: true
+    dropship: true
+  "Checker Distributor":
+    lead_time_days: 7
+    preorder_ok: true
+    dropship: true
+    notes: "Broad-line distributor; fastest replenishment."
+  "Brewer Distributor":
+    lead_time_days: 7
+    dropship: true
+  "Rnk Distributing":
+    lead_time_days: 10
+    dropship: true
+  "Shannon Fabrics":
+    lead_time_days: 14
+  "Moda Fabrics & Supplies":
+    lead_time_days: 14
+  "Superior Threads":
+    lead_time_days: 10
+  "Famore":
+    lead_time_days: 14
+    notes: "Rotary handles/blades heavily overstocked (400+ days cover on several SKUs)."
+  "Linda's Electric Quilters":
+    lead_time_days: 14
+    preorder_ok: true
+    notes: "House brand made by Hobbs."

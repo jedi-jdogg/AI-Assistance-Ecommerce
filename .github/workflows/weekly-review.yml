@@ -1,0 +1,32 @@
+name: Weekly review (Monday 06:00 CT)
+on:
+  schedule:
+    - cron: "0 11 * * 1"
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Apply auto-eligible price changes (ranks 101-500, ≤5%)"
+        default: "false"
+jobs:
+  weekly:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e .
+      - uses: actions/cache@v4
+        with:
+          path: state
+          key: lindas-agent-state-${{ github.run_id }}
+          restore-keys: lindas-agent-state-
+      - env:
+          SHOPIFY_SHOP: ${{ secrets.SHOPIFY_SHOP }}
+          SHOPIFY_ACCESS_TOKEN: ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
+          KLAVIYO_API_KEY: ${{ secrets.KLAVIYO_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ "${{ github.event.inputs.apply }}" = "true" ]; then FLAG=--apply; fi
+          lindas-agent weekly $FLAG
+      - uses: actions/upload-artifact@v4
+        with: { name: weekly-report, path: reports/*.md }

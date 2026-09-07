@@ -1,0 +1,33 @@
+name: Daily brief (07:00 CT)
+on:
+  schedule:
+    - cron: "0 12 * * *"      # 07:00 America/Chicago during CDT (12:00 UTC)
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Apply automated actions (pre-order flips)"
+        default: "false"
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e .
+      - uses: actions/cache@v4
+        with:
+          path: state
+          key: lindas-agent-state-${{ github.run_id }}
+          restore-keys: lindas-agent-state-
+      - name: Run daily brief
+        env:
+          SHOPIFY_SHOP: ${{ secrets.SHOPIFY_SHOP }}
+          SHOPIFY_ACCESS_TOKEN: ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
+          KLAVIYO_API_KEY: ${{ secrets.KLAVIYO_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ "${{ github.event.inputs.apply }}" = "true" ]; then FLAG=--apply; fi
+          lindas-agent daily $FLAG
+      - uses: actions/upload-artifact@v4
+        with: { name: daily-report, path: reports/*.md }

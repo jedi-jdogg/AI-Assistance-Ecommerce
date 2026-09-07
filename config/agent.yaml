@@ -1,0 +1,132 @@
+# ---------------------------------------------------------------------------
+# Linda's Growth Agent — master configuration
+# Every threshold the agent acts on lives here. Change numbers, not code.
+# ---------------------------------------------------------------------------
+store:
+  name: "Linda's Electric Quilters"
+  domain: lindas.com
+  myshopify: lindas-electric-quilters.myshopify.com
+  timezone: America/Chicago
+  currency: USD
+  foresite_tenant_id: 4          # Instant.one / Foresite tenant for lindas.com
+  klaviyo_account_id: WTTPw9
+
+growth:
+  monthly_target_pct: 0.10       # 10% month-over-month total sales
+  baseline_month: "2026-08"       # first target = baseline * 1.10
+  baseline_total_sales: 1120196.91
+  # Where the 10% is expected to come from (used for lever tracking, must sum to ~1.0)
+  lever_mix:
+    email_sms_lifecycle: 0.35
+    conversion_rate: 0.25
+    aov_bundles_upsell: 0.15
+    stock_availability: 0.10
+    organic_traffic: 0.10
+    paid_traffic: 0.05
+
+ranking:
+  # How "top sellers" are ranked for the stock alert tiers
+  window_days: 90
+  rank_by: net_sales             # net_sales | units
+  tiers:
+    critical: 100                # top 100 -> pre-order when out of stock
+    watch: 500                   # top 500 -> alert when out of stock
+  # Line items that are not physical inventory and must never generate alerts
+  exclude_title_patterns:
+    - "Free Returns + Package Protection"
+    - "Gift Card"
+    - "Crafter Club Membership"
+    - "Shipping Protection"
+    - "Route Package"
+  exclude_vendors:
+    - "re:do"
+  exclude_tags:
+    - "digital"
+    - "membership"
+
+inventory:
+  low_cover_days: 14             # warn when days-of-cover falls below this (top 500)
+  critical_cover_days: 7         # critical when below this (top 100)
+  velocity_window_days: 30       # window used to compute daily run-rate
+  # Dropship locations report vendor feed stock. Negative quantities mean the
+  # feed is stale/untracked; treat those variants as "unknown", never "out".
+  treat_negative_as_unknown: true
+  dropship_location_prefix: "DS - "
+  preorder:
+    tag: "Pre-Order"
+    title_suffix: " (Available for PRE-ORDER)"
+    default_eta_weeks: 6
+    inventory_policy_when_preorder: CONTINUE
+    # only vendors we have a standing PO relationship with may auto-flip to pre-order
+    allowed_vendors:
+      - "Hobbs Bonded Fibers"
+      - "Quilters Dream Batting"
+      - "Pellon"
+      - "Warm Company"
+      - "Checker Distributor"
+      - "Linda's Electric Quilters"
+  alert_dedupe_hours: 24
+
+purchasing:
+  review_period_days: 7          # how often POs are cut
+  service_level_z: 1.65          # ~95% in-stock service level
+  target_cover_days: 45          # order up to this many days of forecast demand
+  growth_factor: 1.10            # plan purchases for the growth target, not flat demand
+  min_order_value: 250
+  # Default vendor lead times (days). Override per vendor in vendors.yaml
+  default_lead_time_days: 21
+
+pricing:
+  enabled: true
+  max_change_pct_per_week: 0.05  # never move a price more than 5% in one step
+  min_gross_margin_pct: 0.25     # hard floor on any markdown
+  map_tag: "MAP Pricing"         # never touch products carrying this tag
+  demand_window_days: 14
+  raise:
+    min_days_cover: 0
+    max_days_cover: 14           # scarce
+    min_demand_growth: 0.15      # units up >15% vs prior window
+    step_pct: 0.03
+  lower:
+    min_days_cover: 180          # overstock
+    max_demand_growth: -0.10     # units falling
+    step_pct: 0.10
+    prefer_bundle_over_markdown_if_margin_below: 0.40
+
+conversion:
+  # Bot-traffic detection: sessions spike while add-to-cart sessions stay flat
+  bot_session_zscore: 3.0
+  bot_atc_ratio_floor: 0.03      # ATC sessions / sessions below this => suspect
+  # Funnel guardrails (7-day rolling); alert when breached
+  guardrails:
+    checkout_completion_rate_min: 0.22   # completed / reached checkout
+    atc_to_checkout_min: 0.60
+    aov_drop_pct_alert: -0.12            # vs trailing 28d
+    discount_rate_max: 0.12              # discounts / gross sales
+    return_rate_max: 0.035               # reversals / gross sales
+
+marketing:
+  email:
+    min_campaigns_per_week: 3
+    required_live_flows:
+      - "Abandoned Checkout"
+      - "Abandoned Cart"
+      - "Browse Abandonment"
+      - "Welcome Series"
+      - "Post-Purchase"
+      - "Winback"
+      - "Back in Stock"
+      - "Review Request"
+  attribution:
+    # order_referrer_source blank on ~74% of orders; UTMs required on every link
+    require_utm_on_klaviyo: true
+
+forecast:
+  history_days: 120
+  dow_window_days: 28
+  trend_short_days: 14
+  trend_cap: 0.25                # cap trend multiplier at +/-25%
+
+notify:
+  slack_channel: "#lindas-growth"
+  daily_send_hour_local: 7
