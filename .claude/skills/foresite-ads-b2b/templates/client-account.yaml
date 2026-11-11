@@ -1,0 +1,131 @@
+# ---------------------------------------------------------------------------
+# Foresite Ads Agent — client file (one per client)
+# Store as Foresite tenant attribute `ads.client_config` (preferred) or clients/<slug>/ads-account.yaml.
+# No secrets or tokens in this file — ever. Tokens live in Foresite / the Ads Gateway.
+# Values marked REQUIRED must be filled before any platform write is allowed.
+# ---------------------------------------------------------------------------
+client:
+  slug: __SLUG__                      # REQUIRED, lowercase, used in card IDs and file paths
+  name: "__NAME__"                    # REQUIRED
+  foresite_tenant_id: null            # REQUIRED (integer)
+  model: __MODEL__                    # REQUIRED: b2c | b2b
+  website: ""
+  timezone: America/Chicago
+  currency: USD
+  ratified_by: null                   # who approved this file's targets / standing orders
+  ratified_at: null
+
+platforms:                            # one block per platform the client runs; delete unused
+  meta_ads:
+    account_id: ""                    # REQUIRED for writes, e.g. act_864074647303601
+    account_name: ""                  # REQUIRED — checked live before every write
+    business_id: ""
+    page_id: ""
+    instagram_id: ""
+    pixel_id: ""
+    catalog_id: ""
+    access: read                      # read | write  (what Foresite has been granted)
+  google_ads:
+    customer_id: ""                   # 10 digits, no dashes
+    account_name: ""
+    mcc_id: ""
+    merchant_center_id: ""
+    ga4_property_id: ""
+    access: read
+  linkedin_ads:
+    sponsored_account_id: ""          # urn:li:sponsoredAccount:<id>
+    account_name: ""
+    organization_id: ""               # urn:li:organization:<id>
+    insight_tag_partner_id: ""
+    access: read
+  microsoft_ads:
+    customer_id: ""
+    account_id: ""
+    account_name: ""
+    access: read
+  vibe_ctv:
+    advertiser_id: ""
+    access: read
+
+sources_of_truth:                     # where business outcomes come from
+  commerce: shopify                   # shopify | woocommerce | bigcommerce | none
+  attribution_tool: ""                # fpx | triplewhale | thoughtmetric | northbeam | ga4 | none
+  crm: ""                             # hubspot | salesforce | none   (B2B: REQUIRED)
+  email: klaviyo
+
+metrics:
+  source_of_record:                   # REQUIRED — one named source per metric (definitions are decisions)
+    revenue: ""
+    blended_roas: ""
+    net_profit: ""
+    new_customer_cpa: ""
+    pipeline: ""                      # B2B
+    sql: ""                           # B2B: how an SQL is defined in the CRM
+  attribution_windows:
+    meta: 7d_click_1d_view
+    google: data_driven
+    linkedin: 30d_click_7d_view
+  economics:
+    gross_margin_pct: null            # 0.45 = 45%
+    contribution_margin_pct: null     # after fulfillment, fees, returns
+    aov_usd: null                     # B2C
+    acv_usd: null                     # B2B annual contract value
+    ltv_usd: null
+    break_even_roas: null             # adsctl.py breakeven
+    target_roas: null
+    target_ncac_usd: null             # B2C
+    target_cpl_usd: null              # B2B
+    target_cost_per_sql_usd: null     # B2B
+    payback_months_target: null
+
+budgets:
+  monthly_cap_usd: null               # REQUIRED — anything above is NEW MONEY (escalation)
+  platforms:                          # optional per-platform caps
+    meta_ads: { monthly_cap_usd: null }
+    google_ads: { monthly_cap_usd: null }
+    linkedin_ads: { monthly_cap_usd: null }
+  test_budget_pct: 0.15
+  posture: MONITOR-ONLY               # LIVE | PARTIAL | PAUSED | MONITOR-ONLY
+
+approvals:
+  approvers:                          # REQUIRED — names/handles allowed to approve cards
+    - name: ""
+      slack: ""
+      email: ""
+  operator_limit_usd_per_day: 0       # Operators may approve cards with |money delta| ≤ this (0 = never)
+  channels: [chat, slack_thread]      # chat | slack_thread | ops_console
+  card_expiry_hours: 48
+  max_cards_per_day: 7
+
+standing_orders:                      # Level-3 rules the Approver issued. Each needs issued_by + date.
+  targeting_standards: []             # e.g. {platform: meta_ads, rule: "age 55+, women, Advantage+ audience OFF", issued_by: "", issued_at: ""}
+  disclosures: []                     # e.g. {platform: meta_ads, rule: "AI-info label opt-out", ...}
+  auto_actions: []                    # e.g. {action: "send daily update to board without prompt", ...}
+  emergency_brake:
+    enabled: false
+    max_daily_budget_usd: 0
+    tripwires: [spend_runaway, landing_page_down, tracking_break]
+
+guardrails:                           # overrides of 05-guardrails.md (tighter only unless ratified)
+  budget_step_up_max_pct: 20
+  budget_step_down_max_pct: 30
+  min_hours_between_budget_edits: 72
+  bid_target_step_max_pct: 15
+  min_conversions_for_decision: 30
+  daily_spend_ceiling_multiple: 1.3
+  audience_max_removal_pct: 10
+  audience_max_add_pct: 25
+  audience_max_removal_abs: 10000
+  locked_name_tag: "[LOCKED]"         # entities with this in the name are never touched
+
+reporting:
+  daily:
+    time_local: "07:00"
+    channels: []                      # e.g. ["slack:#client-ads", "email_draft:owner@client.com"]
+  weekly_day: Monday
+  intraday_pacing:
+    enabled: false
+    times_local: ["10:00", "12:00", "14:00", "16:00"]
+    daily_revenue_target_usd: null
+
+known_gaps: []                        # e.g. {item: "Google OAuth expired", since: "2026-11-04"}

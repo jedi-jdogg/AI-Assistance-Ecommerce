@@ -10,6 +10,17 @@ and says which of those jobs can run without a human.
 
 Start with **[docs/00-BASELINE-2026-09.md](docs/00-BASELINE-2026-09.md)** — the live audit that this plan is built on.
 
+## Foresite Ads Agent (B2C + B2B skills)
+
+Human-in-the-loop advertising for any Foresite client across Meta, Google, LinkedIn, Microsoft and CTV:
+daily update, recommendations as Decision Cards, execution only after approval, and a brand-ingestion step
+that writes each client's own playbook. See **[ads-agent-kit/README.md](ads-agent-kit/README.md)**.
+
+```
+/foresite-ads-b2c daily update lindas
+/foresite-ads-b2b onboard <brand>
+```
+
 ## Two ways to run it
 
 **1. Interactive, in Claude Code (no keys needed).** The `/lindas-growth-agent` skill uses the Shopify, Klaviyo,
